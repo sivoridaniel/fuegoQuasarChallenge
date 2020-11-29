@@ -1,11 +1,13 @@
 package com.challenge.meli.controller.api.dto;
 
 import java.util.List;
-import lombok.Builder;
-import lombok.Getter;
 
+import lombok.*;
+
+@Data
 @Builder
-@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class TopSecretReqDto {
     private List<SatelliteDto> satellites;
 }

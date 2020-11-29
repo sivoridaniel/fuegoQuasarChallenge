@@ -1,8 +1,11 @@
+import com.challenge.meli.properties.PositionSatellitesConfig;
 import fj.data.Array;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.BDDMockito;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import com.challenge.meli.service.QuasarService;
 
@@ -10,13 +13,24 @@ import com.challenge.meli.service.QuasarService;
 public class QuasarServiceTest {
 
     private QuasarService quasarService;
+    @MockBean
+    private PositionSatellitesConfig positionSatellitesConfigProperties;
 
     @Before
     public void setup() {
-        float[] positionKenobi = {-500f, -200f};
-        float[] positionSkywalker = {100f, -100f};
-        float[] positionSato = {500f, 100f};
-        this.quasarService = new QuasarService(positionKenobi, positionSkywalker, positionSato);
+
+        Float[] positionKenobi = {-500f, -200f};
+        Float[] positionSkywalker = {100f, -100f};
+        Float[] positionSato = {500f, 100f};
+
+        BDDMockito.given(positionSatellitesConfigProperties.getPositionSatelliteKenovi())
+                  .willReturn(positionKenobi);
+        BDDMockito.given(positionSatellitesConfigProperties.getPositionSatelliteSkywalker())
+                  .willReturn(positionSkywalker);
+        BDDMockito.given(positionSatellitesConfigProperties.getPositionSatelliteSato())
+                  .willReturn(positionSato);
+
+        this.quasarService = new QuasarService(positionSatellitesConfigProperties);
     }
 
     @Test

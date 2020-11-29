@@ -1,12 +1,13 @@
 package com.challenge.meli.controller.api.dto;
 
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
 import java.util.Arrays;
 
+@Data
 @Builder
-@Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class SatelliteDto {
     private String name;
     private Float distance;

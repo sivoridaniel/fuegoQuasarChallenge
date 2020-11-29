@@ -1,10 +1,16 @@
 package com.challenge.meli.service;
 
+import com.challenge.meli.properties.PositionSatellitesConfig;
 import fj.F;
 import fj.F3;
 import fj.data.Array;
 import fj.data.List;
+import org.apache.commons.math3.util.Precision;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 
 import static fj.data.List.list;
 import static java.lang.Math.pow;
@@ -12,57 +18,58 @@ import static java.lang.Math.pow;
 @Service
 public class QuasarService {
 
-    private float P1[];
-    private float P2[];
-    private float P3[];
+    private PositionSatellitesConfig positionSatellitesConfig;
 
-    public QuasarService(float P1[], float P2[], float P3[]){
-        this.P1 = P1;
-        this.P2 = P2;
-        this.P3 = P3;
+    @Autowired
+    public QuasarService(PositionSatellitesConfig positionSatellitesConfig){
+        this.positionSatellitesConfig = positionSatellitesConfig;
     }
 
     public Array<Float> getLocation(Array<Float> distances){
 
-        float d1 = distances.get(0);
-        float d2 = distances.get(1);
-        float d3 = distances.get(2);
+        Float P1[] = this.positionSatellitesConfig.getPositionSatelliteKenovi();
+        Float P2[] = this.positionSatellitesConfig.getPositionSatelliteSkywalker();
+        Float P3[] = this.positionSatellitesConfig.getPositionSatelliteSkywalker();
 
-        double[] ex = new double[2];
-        double[] ey = new double[2];
-        double[] p3p1 = new double[2];
-        double jval = 0;
-        double temp = 0;
-        double ival = 0;
-        double p3p1i = 0;
-        float triptx;
-        float tripty;
-        double xval;
-        double yval;
-        double t1;
-        double t2;
-        double t3;
-        double t;
-        double exx;
-        double d;
-        double eyy;
+        Float d1 = distances.get(0);
+        Float d2 = distances.get(1);
+        Float d3 = distances.get(2);
+
+        Double[] ex = new Double[2];
+        Double[] ey = new Double[2];
+        Double[] p3p1 = new Double[2];
+        Double jval = Double.valueOf(0);
+        Double temp = Double.valueOf(0);
+        Double ival = Double.valueOf(0);
+        Double p3p1i = Double.valueOf(0);
+        Float triptx;
+        Float tripty;
+        Double xval;
+        Double yval;
+        Double t1;
+        Double t2;
+        Double t3;
+        Double t;
+        Double exx;
+        Double d;
+        Double eyy;
 
         for (int i = 0; i < P1.length; i++) {
-            t1 = P2[i];
-            t2 = P1[i];
+            t1 = P2[i].doubleValue();
+            t2 = P1[i].doubleValue();
             t = t1 - t2;
             temp += (t*t);
         }
         d = Math.sqrt(temp);
         for (int i = 0; i < P1.length; i++) {
-            t1 = P2[i];
-            t2 = P1[i];
+            t1 = P2[i].doubleValue();
+            t2 = P1[i].doubleValue();
             exx = (t1 - t2)/(Math.sqrt(temp));
             ex[i] = exx;
         }
         for (int i = 0; i < P3.length; i++) {
-            t1 = P3[i];
-            t2 = P1[i];
+            t1 = P3[i].doubleValue();
+            t2 = P1[i].doubleValue();
             t3 = t1 - t2;
             p3p1[i] = t3;
         }
@@ -72,15 +79,15 @@ public class QuasarService {
             ival += (t1*t2);
         }
         for (int i = 0; i < P3.length; i++) {
-            t1 = P3[i];
-            t2 = P1[i];
+            t1 = P3[i].doubleValue();
+            t2 = P1[i].doubleValue();
             t3 = ex[i] * ival;
             t = t1 - t2 -t3;
             p3p1i += (t*t);
         }
         for (int i = 0; i < P3.length; i++) {
-            t1 = P3[i];
-            t2 = P1[i];
+            t1 = P3[i].doubleValue();
+            t2 = P1[i].doubleValue();
             t3 = ex[i] * ival;
             eyy = (t1 - t2 - t3)/Math.sqrt(p3p1i);
             ey[i] = eyy;
@@ -92,14 +99,14 @@ public class QuasarService {
         }
         xval = (pow(d1, 2) - pow(d2, 2) + pow(d, 2))/(2*d);
         yval = ((pow(d1, 2) - pow(d3, 2) + pow(ival, 2) + pow(jval, 2))/(2*jval)) - ((ival/jval)*xval);
-        t1 = P1[0];
+        t1 = P1[0].doubleValue();
         t2 = ex[0] * xval;
         t3 = ey[0] * yval;
-        triptx = (float) (t1 + t2 + t3);
-        t1 = P1[1];
+        triptx = Precision.round(Double.valueOf(Double.sum(Double.sum(t1, t2) , t3)).floatValue(),2, RoundingMode.HALF_DOWN.ordinal());
+        t1 = P1[1].doubleValue();
         t2 = ex[1] * xval;
         t3 = ey[1] * yval;
-        tripty = (float) (t1 + t2 + t3);
+        tripty = Precision.round(Double.valueOf(Double.sum(Double.sum (t1,t2), t3)).floatValue(),2, RoundingMode.HALF_DOWN.ordinal());
         Array<Float> result = Array.array(triptx, tripty);
         return result;
     }
@@ -150,7 +157,7 @@ public class QuasarService {
                 List<String> lw3 = fBuildMessage.f(messageSatoWFB, i, lw2);
                 return lw3;
             }, list());
-            return lWords.toString();
+            return String.join(" ", lWords);
         }
         return "";
     }

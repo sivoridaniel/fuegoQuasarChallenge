@@ -37,7 +37,7 @@ public class QuasarController {
                                    .message(message)
                                    .position(PositionDto.builder()
                                                         .x(location.get(0))
-                                                        .x(location.get(1))
+                                                        .y(location.get(1))
                                                         .build())
                                    .build();
         });
@@ -48,8 +48,10 @@ public class QuasarController {
     @Builder(toBuilder = true)
     @Getter
     static class TopSecretCMD{
-        private Array<Array<String>> messages;
-        private Array<Float> distances;
+        @Builder.Default
+        private Array<Array<String>> messages=Array.empty();
+        @Builder.Default
+        private Array<Float> distances=Array.empty();
     }
 
     private Vali<TopSecretCMD> valiRequestTopSecret(TopSecretReqDto tsrdto) {
@@ -58,25 +60,27 @@ public class QuasarController {
 
         return v1.bind(satelliteDtos ->
                 fj.data.List.iterableList(satelliteDtos)
-                            .foldLeft((val, sat) ->
-                            {
+                            .foldRight((sat,val) ->
+
                                 Vali.fromNotNullOrBlank(sat.getName(), CodedErrorQUAS.NAME_SATELLITE_REQUIRED.toCodedError())
                                     .bind(name -> Vali.fromNonEmptyJavaList(Arrays.asList(sat.getMessage()),
                                                                             CodedErrorQUAS.MESSAGE_SATELLITE_REQUIRED
                                                                                           .toCodedError()))
                                                       .map(message -> message.toArray())
-                                        .bind(message ->{
-                                            TopSecretCMD tsCMD = val.success();
-                                            Float distance = sat.getDistance();
-                                            return Vali.fromNotNullOrBlank(distance, CodedErrorQUAS.DISTANCE_SATELLITE_REQUIRED
-                                                                                                   .toCodedError())
-                                                       .map(d -> tsCMD.toBuilder()
-                                                                      .distances(Array.array(d))
-                                                                      .messages(Array.array(message))
-                                                                      .build());
-                                        });
-                                return Vali.success(TopSecretCMD.builder().build());
-                            }, Vali.success(TopSecretCMD.builder().build())));
+                                        .bind(message ->
+                                            val.bind(tsCMD -> {
+                                                Float distance = sat.getDistance();
+                                                Array<Float> distances = tsCMD.getDistances();
+                                                Array<Array<String>> messages = tsCMD.getMessages();
+                                                return Vali.fromNotNullOrBlank(distance, CodedErrorQUAS.DISTANCE_SATELLITE_REQUIRED
+                                                                                                       .toCodedError())
+                                                           .map(d -> tsCMD.toBuilder()
+                                                                          .distances(Array.array(d).append(distances))
+                                                                          .messages(Array.array(message).append(messages))
+                                                                          .build());
+                                        }))
+
+                            , Vali.success(TopSecretCMD.builder().build())));
     }
 
 }
