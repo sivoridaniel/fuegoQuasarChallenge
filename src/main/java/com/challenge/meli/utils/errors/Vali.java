@@ -1,4 +1,4 @@
-package com.challenge.meli.utils;
+package com.challenge.meli.utils.errors;
 
 import fj.*;
 import fj.data.List;
@@ -50,9 +50,13 @@ public class Vali<T> {
         return val.isSuccess();
     }
 
+    public boolean isFail() { return val.isFail(); }
+
     public T success() {
         return val.success();
     }
+
+    public NonEmptyList<CodedError> fail() { return val.fail(); }
 
     public <A> Vali<A> map(F<T, A> f) {
         return from(val.map(f));
@@ -62,12 +66,17 @@ public class Vali<T> {
         return from(val.bind(t -> f.f(t).val));
     }
 
-    public ResponseEntity<?> toResponseEntity(HttpStatus errorStatus, HttpStatus okStatus) {
-        return isSuccess() ? new ResponseEntity<>(val.success(), okStatus) : new ResponseEntity<>(val.fail().toList().toJavaList(), errorStatus);
+    public ResponseEntity<?> toResponseEntity(HttpStatus errorStatus, CodedError ce) {
+        return isSuccess() ? new ResponseEntity<>(val.success(), HttpStatus.OK) :
+                (val.fail().toList().exists(c -> c.canEqual(ce))?
+                        new ResponseEntity<>(val.fail().toList().toJavaList(), errorStatus)
+                      : new ResponseEntity<>(val.fail().toList().toJavaList(), HttpStatus.BAD_REQUEST));
     }
 
     public ResponseEntity<?> toResponseEntity() {
-        return toResponseEntity(HttpStatus.BAD_REQUEST, HttpStatus.OK);
+        return isSuccess() ? new ResponseEntity<>(val.success(), HttpStatus.OK) :
+                             new ResponseEntity<>(val.fail().toList().toJavaList(), HttpStatus.BAD_REQUEST);
+
     }
 
     @Override

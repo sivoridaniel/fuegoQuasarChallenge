@@ -1,7 +1,7 @@
 package com.challenge.meli.controller.api.dto;
 
-import com.challenge.meli.utils.CodedError;
-import com.challenge.meli.utils.Vali;
+import com.challenge.meli.utils.errors.CodedError;
+import com.challenge.meli.utils.errors.Vali;
 
 import java.text.MessageFormat;
 
@@ -10,7 +10,8 @@ public enum CodedErrorQUAS {
     INFO_SATELLITES_REQUIRED("001", "Satellite information can't be empty"),
     NAME_SATELLITE_REQUIRED("002", "Satellite's name is required"),
     MESSAGE_SATELLITE_REQUIRED("003", "Satellite's message is required"),
-    DISTANCE_SATELLITE_REQUIRED("004", "Satellite's distance is required");
+    DISTANCE_SATELLITE_REQUIRED("004", "Satellite's distance is required"),
+    INTERPRETATION_FAILURE("005","Interpretation failure");
 
     private static final String QUAS = "QUAS-";
     private String codigo;

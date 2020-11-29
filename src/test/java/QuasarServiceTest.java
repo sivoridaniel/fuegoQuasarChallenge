@@ -1,4 +1,5 @@
-import com.challenge.meli.properties.PositionSatellitesConfig;
+import com.challenge.meli.properties.QASConfig;
+import com.challenge.meli.utils.cache.QasCache;
 import fj.data.Array;
 import org.junit.Assert;
 import org.junit.Before;
@@ -14,7 +15,7 @@ public class QuasarServiceTest {
 
     private QuasarService quasarService;
     @MockBean
-    private PositionSatellitesConfig positionSatellitesConfigProperties;
+    private QASConfig qasConfigProperties;
 
     @Before
     public void setup() {
@@ -23,14 +24,16 @@ public class QuasarServiceTest {
         Float[] positionSkywalker = {100f, -100f};
         Float[] positionSato = {500f, 100f};
 
-        BDDMockito.given(positionSatellitesConfigProperties.getPositionSatelliteKenovi())
+        BDDMockito.given(qasConfigProperties.getPositionSatelliteKenovi())
                   .willReturn(positionKenobi);
-        BDDMockito.given(positionSatellitesConfigProperties.getPositionSatelliteSkywalker())
+        BDDMockito.given(qasConfigProperties.getPositionSatelliteSkywalker())
                   .willReturn(positionSkywalker);
-        BDDMockito.given(positionSatellitesConfigProperties.getPositionSatelliteSato())
+        BDDMockito.given(qasConfigProperties.getPositionSatelliteSato())
                   .willReturn(positionSato);
+        BDDMockito.given(qasConfigProperties.getExpirationTimeCache())
+                  .willReturn(60000L);
 
-        this.quasarService = new QuasarService(positionSatellitesConfigProperties);
+        this.quasarService = new QuasarService(qasConfigProperties);
     }
 
     @Test

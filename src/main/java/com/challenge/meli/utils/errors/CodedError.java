@@ -1,4 +1,4 @@
-package com.challenge.meli.utils;
+package com.challenge.meli.utils.errors;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;

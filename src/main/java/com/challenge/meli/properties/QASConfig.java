@@ -1,10 +1,11 @@
 package com.challenge.meli.properties;
 
+import fj.data.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class PositionSatellitesConfig {
+public class QASConfig {
 
     @Value("#{'${position.satelliteKenovi}'.split(',')}")
     private String[] positionSatelliteKenovi;
@@ -12,6 +13,10 @@ public class PositionSatellitesConfig {
     private String[] positionSatelliteSkywalker;
     @Value("#{'${position.satelliteSato}'.split(',')}")
     private String[] positionSatelliteSato;
+    @Value("#{${cache.expirationTime}")
+    private Long expirationTimeCache;
+    @Value("##{'${satellites.names}'.split(',')}")
+    private List<String> satellitesNames;
 
     public Float[] getPositionSatelliteKenovi() {
         return fj.data.Array.array(positionSatelliteKenovi)
@@ -31,4 +36,11 @@ public class PositionSatellitesConfig {
                             .array(Float[].class);
     }
 
+    public Long getExpirationTimeCache(){
+        return this.expirationTimeCache;
+    }
+
+    public List<String> getSatellitesNames() {
+        return satellitesNames;
+    }
 }

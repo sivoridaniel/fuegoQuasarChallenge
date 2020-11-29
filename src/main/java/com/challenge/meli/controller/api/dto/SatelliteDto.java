@@ -5,7 +5,7 @@ import lombok.*;
 import java.util.Arrays;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 public class SatelliteDto {

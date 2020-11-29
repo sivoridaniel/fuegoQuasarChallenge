@@ -1,35 +1,41 @@
 package com.challenge.meli.service;
 
-import com.challenge.meli.properties.PositionSatellitesConfig;
+import com.challenge.meli.properties.QASConfig;
+import com.challenge.meli.utils.cache.QasCache;
 import fj.F;
 import fj.F3;
+import fj.P2;
 import fj.data.Array;
 import fj.data.List;
+import lombok.Builder;
+import lombok.Getter;
 import org.apache.commons.math3.util.Precision;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 
+import static fj.P.p;
 import static fj.data.List.list;
 import static java.lang.Math.pow;
 
 @Service
 public class QuasarService {
 
-    private PositionSatellitesConfig positionSatellitesConfig;
+    private QASConfig qasConfig;
+    private QasCache<String, SatelliteValue> qasCache;
 
     @Autowired
-    public QuasarService(PositionSatellitesConfig positionSatellitesConfig){
-        this.positionSatellitesConfig = positionSatellitesConfig;
+    public QuasarService(QASConfig qasConfig){
+        this.qasConfig = qasConfig;
+        this.qasCache = new QasCache<>(qasConfig.getExpirationTimeCache());
     }
 
     public Array<Float> getLocation(Array<Float> distances){
 
-        Float P1[] = this.positionSatellitesConfig.getPositionSatelliteKenovi();
-        Float P2[] = this.positionSatellitesConfig.getPositionSatelliteSkywalker();
-        Float P3[] = this.positionSatellitesConfig.getPositionSatelliteSkywalker();
+        Float P1[] = this.qasConfig.getPositionSatelliteKenovi();
+        Float P2[] = this.qasConfig.getPositionSatelliteSkywalker();
+        Float P3[] = this.qasConfig.getPositionSatelliteSkywalker();
 
         Float d1 = distances.get(0);
         Float d2 = distances.get(1);
@@ -162,4 +168,31 @@ public class QuasarService {
         return "";
     }
 
+
+    @Builder(toBuilder = true)
+    @Getter
+    static class SatelliteValue{
+        private Array<Float> distance;
+        private Array<String> message;
+    }
+
+    public P2<Array<Float>, String> getLocationAndMessage(String nameSatellite, Array<Float> distance,
+                                                          Array<String> message) {
+        qasCache.clean();
+        SatelliteValue satInputValue = SatelliteValue.builder().distance(distance).message(message).build();
+        qasCache.set(nameSatellite, satInputValue);
+        List<String> satellitesNames = qasConfig.getSatellitesNames();
+
+        if(qasCache.containsAll(satellitesNames)){
+            P2<Array<Float>, Array<Array<String>>> pDistancesMessages = satellitesNames.foldLeft((p, sn) -> {
+                SatelliteValue satItValue = qasCache.get(sn).some();
+                return p(p._1().append(satItValue.getDistance()), p._2().append(Array.array(satItValue.getMessage())));
+            }, p(Array.empty(), Array.empty()));
+
+            return p(getLocation(pDistancesMessages._1()), getMessage(pDistancesMessages._2()));
+
+        }
+
+        return p(Array.empty(),"");
+    }
 }
