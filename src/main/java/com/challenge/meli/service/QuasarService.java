@@ -28,7 +28,7 @@ public class QuasarService {
     @Autowired
     public QuasarService(QASConfig qasConfig){
         this.qasConfig = qasConfig;
-        this.qasCache = new QasCache<>(qasConfig.getExpirationTimeCache());
+        this.qasCache = new QasCache<>(qasConfig.getCacheExpirationTime());
     }
 
     public Array<Float> getLocation(Array<Float> distances){

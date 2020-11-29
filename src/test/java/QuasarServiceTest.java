@@ -30,7 +30,7 @@ public class QuasarServiceTest {
                   .willReturn(positionSkywalker);
         BDDMockito.given(qasConfigProperties.getPositionSatelliteSato())
                   .willReturn(positionSato);
-        BDDMockito.given(qasConfigProperties.getExpirationTimeCache())
+        BDDMockito.given(qasConfigProperties.getCacheExpirationTime())
                   .willReturn(60000L);
 
         this.quasarService = new QuasarService(qasConfigProperties);

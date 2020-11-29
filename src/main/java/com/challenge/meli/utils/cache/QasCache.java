@@ -53,7 +53,7 @@ public class QasCache<K, V> implements IQasCache<K, V> {
 
     @Override
     public boolean containsAll(List<K> keys) {
-        return keys.foldLeft((exist, key) -> exist? this.containsKey(key): false,Boolean.TRUE);
+        return keys.foldLeft((exist, key) -> (exist? this.containsKey(key): false),Boolean.TRUE);
     }
 
     @Override

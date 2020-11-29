@@ -13,10 +13,10 @@ public class QASConfig {
     private String[] positionSatelliteSkywalker;
     @Value("#{'${position.satelliteSato}'.split(',')}")
     private String[] positionSatelliteSato;
-    @Value("#{${cache.expirationTime}")
-    private Long expirationTimeCache;
-    @Value("##{'${satellites.names}'.split(',')}")
-    private List<String> satellitesNames;
+    @Value("${cache.expirationTime}")
+    private Long cacheExpirationTime;
+    @Value("#{'${satellites.names}'.split(',')}")
+    private String[] satellitesNames;
 
     public Float[] getPositionSatelliteKenovi() {
         return fj.data.Array.array(positionSatelliteKenovi)
@@ -36,11 +36,11 @@ public class QASConfig {
                             .array(Float[].class);
     }
 
-    public Long getExpirationTimeCache(){
-        return this.expirationTimeCache;
+    public Long getCacheExpirationTime(){
+        return this.cacheExpirationTime;
     }
 
     public List<String> getSatellitesNames() {
-        return satellitesNames;
+        return fj.data.List.arrayList(satellitesNames);
     }
 }
