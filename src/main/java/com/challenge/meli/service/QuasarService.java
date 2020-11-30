@@ -35,7 +35,7 @@ public class QuasarService {
 
         Float P1[] = this.qasConfig.getPositionSatelliteKenovi();
         Float P2[] = this.qasConfig.getPositionSatelliteSkywalker();
-        Float P3[] = this.qasConfig.getPositionSatelliteSkywalker();
+        Float P3[] = this.qasConfig.getPositionSatelliteSato();
 
         Float d1 = distances.get(0);
         Float d2 = distances.get(1);
